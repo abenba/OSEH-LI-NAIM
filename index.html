@@ -339,6 +339,7 @@
 <script>
 const API_URL = "/.netlify/functions/claude";
 const MODEL = "claude-sonnet-4-6";
+const FAST_MODEL = "claude-haiku-4-5-20251001";
 const STORAGE_KEY = "hafshara_cases_v1";
 const ONBOARD_KEY = "hafshara_onboarded_v1";
 
@@ -461,13 +462,13 @@ function escapeHtml(str){
 }
 
 /* ---------- API helper ---------- */
-async function callClaude(systemPrompt, userText, maxTokens){
+async function callClaude(systemPrompt, userText, maxTokens, model){
   try{
     const response = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: MODEL,
+        model: model || MODEL,
         max_tokens: maxTokens || 1000,
         system: systemPrompt,
         messages: [{ role: "user", content: userText }]
@@ -563,10 +564,10 @@ async function fetchOptions(){
 
   const systemPrompt = `אתה עוזר שמציע דרכי פעולה מעשיות לסגירת "אי נעימות" בין־אישית. קיבלת תיאור מקרה, את הקשר עם הצד השני, ואת ציון העוצמה שלו. עליך להחזיר אך ורק אובייקט JSON תקין, ללא טקסט נוסף וללא markdown, במבנה הבא:
 {"options": [ {"title": "כותרת קצרה של הפעולה, 2-4 מילים", "description": "הסבר קצר ומעשי מה עושים בפועל", "effort": "קל" או "בינוני" או "גבוה", "expectedOutcome": "משפט אחד על מה זה כנראה ישיג, כולל מחיר או סיכון אם רלוונטי", "message": "נוסח הודעה מוכן לשליחה בעברית, טבעי ולא רשמי מדי, או null אם לא רלוונטי לאפשרות הזו"} ]}
-החזר בין 3 ל-4 אפשרויות. האפשרות האחרונה חייבת תמיד להיות "לא לעשות כלום", עם expectedOutcome שמתאר בכנות את המחיר האמיתי של אי־פעולה, לא רק דחייה שלה. אל תמליץ תמיד על אותה הפעולה, התאם את האפשרויות לעוצמה ולסוג הקשר. שמור על כל שדה תמציתי: description עד 25 מילה, expectedOutcome עד 20 מילה, message עד 40 מילה.`;
+החזר בדיוק 3 אפשרויות, לא יותר. האפשרות האחרונה חייבת תמיד להיות "לא לעשות כלום", עם expectedOutcome שמתאר בכנות את המחיר האמיתי של אי־פעולה, לא רק דחייה שלה. אל תמליץ תמיד על אותה הפעולה, התאם את האפשרויות לעוצמה ולסוג הקשר. שמור על כל שדה קצר וממוקד: description עד 15 מילה, expectedOutcome עד 12 מילה, message עד 25 מילה. אל תוסיף הסברים או מבוא, רק את אובייקט ה-JSON.`;
 
   const userText = `תיאור המקרה: ${c.text}\nקשר: ${c.relation}\nעוצמה: ${c.intensity}/10\nנימוק: ${c.reasoning}`;
-  const result = await callClaude(systemPrompt, userText, 1800);
+  const result = await callClaude(systemPrompt, userText, 1100, FAST_MODEL);
 
   if(result && Array.isArray(result.options)){
     c.options = result.options;
