@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>עושה לי נעים — על האפליקציה</title>
+<title>עושה לי נעים — לסגור מה שנשאר פתוח</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#EFEAE1;
@@ -15,216 +15,725 @@
     --accent:#3C5A52;
     --accent-soft:#DDE6E2;
     --mid:#B8873A;
+    --mid-soft:#F3E6D2;
     --warn:#A6432E;
+    --warn-soft:#F3DED8;
     --border:#DDD5C7;
+    --radius:16px;
+    --shadow:0 3px 14px rgba(43,43,38,.09);
   }
-  *{box-sizing:border-box; margin:0; padding:0;}
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
   body{
     background:var(--paper);
     color:var(--ink);
     font-family:'Heebo',sans-serif;
-    line-height:1.75;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
   }
-  .page{
-    max-width:720px;
-    margin:0 auto;
-    padding:72px 32px 90px;
-  }
-
-  /* Header */
-  .brand-row{display:flex; align-items:center; gap:14px; margin-bottom:8px;}
-  .brand{
-    font-family:'Frank Ruhl Libre',serif;
-    font-weight:900; font-size:52px; letter-spacing:-.5px;
-  }
-  .kicker{
-    font-size:14px; font-weight:600; color:var(--accent);
-    letter-spacing:.5px; margin-bottom:56px;
-  }
-
-  /* Opening statement */
-  .opening{
-    font-family:'Frank Ruhl Libre',serif;
-    font-size:29px; line-height:1.55; font-weight:500;
-    margin-bottom:18px;
-  }
-  .opening .stuck{
-    color:var(--warn); font-weight:700;
-  }
-  .lead{
-    font-size:18px; color:var(--ink); margin-bottom:14px;
-  }
-  .lead b{font-weight:700;}
-  .lead .appname{
-    font-family:'Frank Ruhl Libre',serif; font-weight:700; color:var(--accent);
-  }
-
-  /* Divider with dot — the loop motif */
-  .divider{
-    display:flex; align-items:center; gap:14px; margin:48px 0;
-  }
-  .divider .line{flex:1; height:1px; background:var(--border);}
-  .divider svg{flex-shrink:0;}
-
-  /* AI section */
-  .section-title{
-    font-family:'Frank Ruhl Libre',serif;
-    font-size:24px; font-weight:700; margin-bottom:16px;
-  }
-  .ai-block{
-    background:var(--card);
-    border:1px solid var(--border);
-    border-radius:20px;
-    padding:34px 36px;
-    box-shadow:0 3px 18px rgba(43,43,38,.07);
-    margin-bottom:16px;
-  }
-  .ai-block p{font-size:17px; margin-bottom:14px;}
-  .ai-block p:last-child{margin-bottom:0;}
-  .ai-block .honest{
-    border-right:3px solid var(--accent);
-    padding-right:16px;
-    color:var(--ink-soft);
-    font-size:16px;
-  }
-  .ai-block .honest b{color:var(--ink);}
-
-  /* Three moves strip */
-  .moves{
-    display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px;
-    margin:20px 0 0;
-  }
-  .move{
+  #app{
+    width:100%;
+    max-width:480px;
+    min-height:100vh;
     background:var(--paper);
-    border:1.5px solid var(--border);
-    border-radius:16px;
-    padding:18px 16px;
+    position:relative;
+    padding-bottom:40px;
   }
-  .move .num{
-    font-family:'Frank Ruhl Libre',serif;
-    font-size:26px; font-weight:900; color:var(--accent);
-    margin-bottom:6px;
-  }
-  .move .t{font-weight:700; font-size:15px; margin-bottom:4px;}
-  .move .d{font-size:13.5px; color:var(--ink-soft); line-height:1.6;}
-  .move.dashed{border-style:dashed;}
+  .view{display:none; animation:fadeIn .35s ease;}
+  .view.active{display:block;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
 
-  /* Closing */
-  .closing{
-    margin-top:52px;
-  }
-  .closing p{font-size:18px; margin-bottom:14px;}
-  .punch{
-    font-family:'Frank Ruhl Libre',serif;
-    font-size:24px; font-weight:700; line-height:1.5;
-    color:var(--accent);
-    margin-top:26px;
-    padding-top:26px;
-    border-top:1px solid var(--border);
-  }
+  h1,h2,h3{font-family:'Frank Ruhl Libre',serif; margin:0; color:var(--ink);}
+  p{margin:0;}
 
-  .site{
-    margin-top:56px;
-    text-align:center;
-  }
-  .site a{
-    display:inline-block;
+  /* Onboarding */
+  #view-onboarding{padding:56px 28px 28px;}
+  .brand-row{display:flex; align-items:center; gap:10px;}
+  .brand-icon{flex-shrink:0;}
+  .brand{font-family:'Frank Ruhl Libre',serif; font-weight:700; font-size:29px; letter-spacing:.3px;}
+  .tagline{font-size:14px; color:var(--ink-soft); margin-bottom:36px;}
+  .lede{font-family:'Frank Ruhl Libre',serif; font-size:21px; line-height:1.6; color:var(--ink); margin-bottom:22px; font-weight:500;}
+  .lede b{font-weight:700; font-size:1.08em; color:var(--accent);}
+  .lede-q{font-size:17px; line-height:1.75; color:var(--ink); margin-bottom:36px;}
+  .btn{
+    display:inline-block; border:none; cursor:pointer;
+    font-family:'Heebo',sans-serif; font-weight:600; font-size:15px;
+    border-radius:999px; padding:14px 26px;
     background:var(--ink); color:var(--paper);
-    text-decoration:none; font-weight:600; font-size:15px;
-    border-radius:999px; padding:14px 34px;
+    transition:transform .15s ease, opacity .15s ease;
+    width:100%; text-align:center;
   }
-  .site .u{
-    display:block; margin-top:12px; font-size:13px; color:var(--ink-soft);
+  .btn:active{transform:scale(.98);}
+  .btn-outline{
+    background:transparent; color:var(--ink); border:1.5px solid var(--border);
+  }
+  .btn-ghost{
+    background:transparent; color:var(--ink-soft); font-weight:500; padding:10px;
+  }
+  .btn-accent{background:var(--accent); color:#fff;}
+
+  /* Top bar */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:22px 22px 10px;
+  }
+  .topbar h1{font-size:24px;}
+  .icon-btn{
+    width:38px; height:38px; border-radius:50%; border:1.5px solid var(--border);
+    background:var(--card); display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:18px; color:var(--ink); flex-shrink:0;
   }
 
-  @media (max-width:560px){
-    .brand{font-size:38px;}
-    .opening{font-size:24px;}
-    .moves{grid-template-columns:1fr;}
-    .page{padding:48px 22px 70px;}
-    .ai-block{padding:26px 22px;}
+  /* Home list */
+  #home-list{padding:6px 20px 90px;}
+  .empty-state{
+    margin:60px 20px; text-align:center; color:var(--ink-soft);
   }
-  @media print{
-    body{background:#fff;}
-    .site a{background:#fff; color:var(--ink); border:1.5px solid var(--ink);}
+  .empty-state p{font-size:15px; line-height:1.7; margin-bottom:22px;}
+  .case-card{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:16px; margin-bottom:12px;
+    display:flex; align-items:center; gap:14px; cursor:pointer;
   }
+  .gauge{
+    width:46px; height:46px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+  }
+  .gauge span{font-size:13px; font-weight:700; font-family:'Heebo';}
+  .card-body{flex:1; min-width:0;}
+  .card-title{font-size:15px; font-weight:600; margin-bottom:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .card-sub{font-size:12.5px; color:var(--ink-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .badge{
+    font-size:11px; font-weight:600; padding:4px 10px; border-radius:999px; flex-shrink:0;
+  }
+  .badge-amber{background:var(--mid-soft); color:var(--mid);}
+  .badge-teal{background:var(--accent-soft); color:var(--accent);}
+  .badge-done{background:#e7e4dc; color:var(--ink-soft);}
+
+  .fab-wrap{
+    position:fixed; bottom:26px; left:50%; transform:translateX(-50%);
+    width:100%; max-width:480px; display:flex; justify-content:flex-start;
+    padding:0 24px; pointer-events:none; z-index:10;
+  }
+  .fab{
+    pointer-events:auto;
+    width:58px; height:58px; border-radius:50%; background:var(--ink); color:var(--paper);
+    display:flex; align-items:center; justify-content:center; font-size:28px; border:none;
+    box-shadow:0 6px 18px rgba(43,43,38,.28); cursor:pointer;
+  }
+
+  .insight-box{
+    margin:0 20px 18px; background:var(--accent); color:#fff; border-radius:var(--radius);
+    padding:16px 18px; font-size:13.5px; line-height:1.65;
+  }
+  .insight-box b{font-weight:700;}
+
+  /* Form views */
+  .form-wrap{padding:10px 22px 40px;}
+  label.field-label{display:block; font-size:13px; color:var(--ink-soft); margin-bottom:8px; font-weight:600;}
+  textarea, input[type=text]{
+    width:100%; border:1.5px solid var(--border); border-radius:12px; padding:14px;
+    font-family:'Heebo'; font-size:15px; background:var(--card); color:var(--ink);
+    resize:vertical;
+  }
+  textarea:focus, input:focus{outline:2px solid var(--accent); outline-offset:1px;}
+  .counter{font-size:12px; color:var(--ink-soft); text-align:left; margin-top:6px;}
+  .counter.over{color:var(--warn);}
+
+  .loading-wrap{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:90px 30px; text-align:center; color:var(--ink-soft); gap:16px;
+  }
+  .spinner{
+    width:34px; height:34px; border-radius:50%;
+    border:3px solid var(--border); border-top-color:var(--accent);
+    animation:spin 0.9s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .result-card{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:24px; margin:10px 20px 20px; text-align:center;
+  }
+  .big-gauge{width:120px; height:120px; margin:0 auto 14px; border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative;}
+  .big-gauge-inner{width:92px; height:92px; border-radius:50%; background:var(--card); display:flex; flex-direction:column; align-items:center; justify-content:center;}
+  .big-gauge-inner .num{font-family:'Frank Ruhl Libre'; font-size:34px; font-weight:700;}
+  .big-gauge-inner .of10{font-size:11px; color:var(--ink-soft);}
+  .relation-chip{
+    display:inline-block; font-size:12px; font-weight:600; color:var(--ink-soft);
+    background:var(--paper); border:1px solid var(--border); border-radius:999px; padding:4px 12px; margin-bottom:14px;
+  }
+  .reasoning{font-size:14.5px; line-height:1.7; margin-bottom:16px;}
+  .spotlight{
+    background:var(--paper); border-radius:12px; padding:14px 16px; font-size:13.5px;
+    line-height:1.7; color:var(--ink-soft); text-align:right; border-right:3px solid var(--accent);
+  }
+  .spotlight b{color:var(--ink); font-weight:600;}
+
+  .section-label{font-size:13px; font-weight:700; color:var(--ink-soft); margin:24px 20px 10px; letter-spacing:.2px;}
+
+  .option-card{
+    background:var(--card); border:1.5px solid var(--border); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:18px; margin:0 20px 14px; cursor:pointer;
+    transition:border-color .15s ease;
+  }
+  .option-card:active{border-color:var(--accent);}
+  .option-card.noop{border-style:dashed;}
+  .option-top{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:8px;}
+  .option-title{font-size:16px; font-weight:700; font-family:'Frank Ruhl Libre';}
+  .effort-chip{font-size:11px; font-weight:600; padding:3px 10px; border-radius:999px; flex-shrink:0; white-space:nowrap;}
+  .effort-קל{background:var(--accent-soft); color:var(--accent);}
+  .effort-בינוני{background:var(--mid-soft); color:var(--mid);}
+  .effort-גבוה{background:var(--warn-soft); color:var(--warn);}
+  .option-desc{font-size:14px; line-height:1.65; color:var(--ink); margin-bottom:8px;}
+  .option-outcome{font-size:12.5px; color:var(--ink-soft); line-height:1.6;}
+  .option-outcome b{color:var(--ink); font-weight:600;}
+
+  .message-box{
+    background:var(--paper); border-radius:10px; padding:12px 14px; font-size:13.5px;
+    line-height:1.6; margin-top:10px; position:relative; white-space:pre-wrap;
+  }
+  .copy-btn{
+    margin-top:8px; font-size:12px; font-weight:600; color:var(--accent); background:none; border:none;
+    cursor:pointer; padding:0;
+  }
+
+  .detail-status{padding:0 20px 16px;}
+  .outcome-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 20px 16px;}
+  .outcome-opt{
+    border:1.5px solid var(--border); border-radius:12px; padding:14px 10px; text-align:center;
+    background:var(--card); cursor:pointer; font-size:13.5px; font-weight:600;
+  }
+  .outcome-opt.selected{border-color:var(--accent); background:var(--accent-soft); color:var(--accent);}
+
+  .msg-quiet{font-size:13px; color:var(--ink-soft); text-align:center; padding:0 30px; margin-top:10px; line-height:1.6;}
+
+  .sticky-bottom{position:sticky; bottom:0; padding:16px 20px 6px; background:linear-gradient(to top, var(--paper) 60%, transparent);}
 </style>
 </head>
 <body>
-<div class="page">
+<div id="app">
 
-  <div class="brand-row">
-    <svg width="44" height="44" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M24 10a10 10 0 1 0 2 8" stroke="#3C5A52" stroke-width="2.6" stroke-linecap="round"/>
-      <circle cx="26" cy="8" r="2.4" fill="#3C5A52"/>
-    </svg>
-    <div class="brand">עושה לי נעים</div>
-  </div>
-  <div class="kicker">לסגור מה שנשאר פתוח</div>
-
-  <p class="opening">
-    יש רגע שאתה מכיר טוב. משהו קרה, קטן כמעט תמיד, <span class="stuck">וזה נשאר תקוע.</span>
-  </p>
-  <p class="lead">
-    הודעה שלא ענית עליה, מחווה שלא הוחזרה, שקט ששכח למה הוא התחיל. אתה לא רב עם אף אחד, פשוט נושא את זה. וזה נשאר.
-  </p>
-  <p class="lead">
-    עד עכשיו הפתרון היה או לשתוק עד שזה נמוג מעצמו, או להתמודד לבד עם המשפט הראשון שאף פעם לא יוצא נכון. <span class="appname">עושה לי נעים</span> בונה שלב באמצע, שלא היה קיים.
-  </p>
-
-  <div class="divider">
-    <div class="line"></div>
-    <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M24 10a10 10 0 1 0 2 8" stroke="#B8873A" stroke-width="2.6" stroke-linecap="round"/>
-      <circle cx="26" cy="8" r="2.4" fill="#B8873A"/>
-    </svg>
-    <div class="line"></div>
+  <!-- ONBOARDING -->
+  <div class="view" id="view-onboarding">
+    <div class="brand-row" style="margin-bottom:30px;">
+      <svg class="brand-icon" width="30" height="30" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M24 10a10 10 0 1 0 2 8" stroke="#3C5A52" stroke-width="2.6" stroke-linecap="round"/>
+        <circle cx="26" cy="8" r="2.4" fill="#3C5A52"/>
+      </svg>
+      <div class="brand">עושה לי נעים</div>
+    </div>
+    <p class="lede">
+      זה קורה לא פעם: משהו שלא נאמר, חוב קטן שלא שולם, התנצלות שנתקעה, סירוב שלא יצא מהפה, הודעה שלא נענתה מספיק זמן עד שכבר לא מסתדר לענות. מי לא מכיר? קוראים לזה <b>אי-נעימות</b>.
+    </p>
+    <p class="lede-q">האם לא הגיע הזמן לפרק את זה? לסגור את הסיפור?</p>
+    <button class="btn" onclick="startFirstCase()">פותחים תיק ראשון</button>
   </div>
 
-  <h2 class="section-title">מה הבינה המלאכותית עושה כאן באמת</h2>
-  <div class="ai-block">
-    <p>
-      היא לא כותבת לך תשובות אוטומטיות ולא מרגיעה אותך סתם. היא נכנסת פנימה, לבד איתך, ומודדת בפועל את מה שקרה: <b>כמה זה כבד באמת</b>, ביחס לקרבה, לזמן שעבר, למי שהיה אחראי.
-    </p>
-    <p class="honest">
-      היא אומרת לך גם <b>איך זה כנראה נראה מהצד השני</b>. לפעמים מרגיע, לפעמים לא, אבל תמיד כן.
-    </p>
-    <p>
-      ואז היא לא משאירה אותך שם. היא מציעה שלוש דרכים אמיתיות להתקדם:
-    </p>
-    <div class="moves">
-      <div class="move">
-        <div class="num">1</div>
-        <div class="t">למדוד</div>
-        <div class="d">עוצמת האירוע, מכוילת למציאות, לא לחשש</div>
+  <!-- HOME -->
+  <div class="view" id="view-home">
+    <div class="topbar">
+      <div class="brand-row">
+        <svg class="brand-icon" width="20" height="20" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M24 10a10 10 0 1 0 2 8" stroke="#3C5A52" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="26" cy="8" r="2.6" fill="#3C5A52"/>
+        </svg>
+        <h1>עושה לי נעים</h1>
       </div>
-      <div class="move">
-        <div class="num">2</div>
-        <div class="t">לפעול</div>
-        <div class="d">דרכי פעולה קונקרטיות, כולל נוסח מוכן לשליחה</div>
-      </div>
-      <div class="move dashed">
-        <div class="num">3</div>
-        <div class="t">או לא</div>
-        <div class="d">האופציה הכי כנה שיש: לא לעשות כלום, עם המחיר האמיתי שלה על השולחן</div>
-      </div>
+      <div class="icon-btn" onclick="showInfo()">i</div>
+    </div>
+    <div id="insight-slot"></div>
+    <div id="home-list"></div>
+    <div class="fab-wrap"><button class="fab" onclick="goTo('new')" aria-label="תיק חדש">+</button></div>
+  </div>
+
+  <!-- INFO / RESET MODAL -->
+  <div id="modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(43,43,38,.45); z-index:50; align-items:center; justify-content:center; padding:24px;">
+    <div style="background:var(--card); border-radius:var(--radius); padding:24px; max-width:340px; box-shadow:var(--shadow);">
+      <p style="font-size:14px; line-height:1.7; margin-bottom:20px;">כל הנתונים נשמרים רק במכשיר שלך, ולא נשלחים לשום מקום.</p>
+      <p style="font-size:13px; line-height:1.7; color:var(--ink-soft); margin-bottom:20px;">אפשר לאפס את כל הנתונים ולהתחיל ממסך הפתיחה מחדש (לצורך בדיקה).</p>
+      <button class="btn" style="background:var(--warn); margin-bottom:10px;" onclick="resetApp()">איפוס כל הנתונים</button>
+      <button class="btn btn-ghost" onclick="closeModal()">סגירה</button>
     </div>
   </div>
 
-  <div class="closing">
-    <p>
-      זו לא אפליקציה שמייעצת מרחוק. היא שותפה בזמן אמת לרגע הכי לא נוח שיש, הרגע שבין מה שקרה למה שעדיין אפשר לתקן.
-    </p>
-    <p class="punch">
-      ובסוף, אחרי כמה תיקים שנסגרו, היא מראה לך משהו שאף אחד לא היה יכול להגיד לך בעצמו: כמה מהפעמים החשש שלך היה גדול הרבה יותר מהמציאות.
-    </p>
+  <!-- STAGE 1: input -->
+  <div class="view" id="view-new">
+    <div class="topbar">
+      <div class="icon-btn" onclick="goBack()">‹</div>
+      <h1 style="font-size:19px;">מה קרה?</h1>
+      <div style="width:38px;"></div>
+    </div>
+    <div class="form-wrap">
+      <label class="field-label">ספרו בקצרה מה קרה ומול מי (עד 100 מילה)</label>
+      <textarea id="case-input" rows="7" placeholder="לדוגמה: לפני שבועיים ביטלתי בהודעה קצרה ארוחה עם חברה קרובה, בלי הסבר טוב. מאז לא דיברנו."></textarea>
+      <div class="counter" id="word-counter">0 / 100 מילים</div>
+    </div>
+    <div class="sticky-bottom">
+      <button class="btn" id="submit-case-btn" onclick="submitCase()">הערכת האירוע</button>
+    </div>
   </div>
 
-  <div class="site">
-    <a href="https://oseh-li-naim.netlify.app" target="_blank">פותחים תיק ראשון</a>
-    <span class="u">oseh-li-naim.netlify.app</span>
+  <!-- LOADING -->
+  <div class="view" id="view-loading">
+    <div class="loading-wrap">
+      <div class="spinner"></div>
+      <p id="loading-text">בודקים את התמונה המלאה...</p>
+    </div>
+  </div>
+
+  <!-- STAGE 1 RESULT -->
+  <div class="view" id="view-stage1">
+    <div class="topbar">
+      <div class="icon-btn" onclick="goBack()">‹</div>
+      <h1 style="font-size:19px;">מה קורה כעת? הערכה זעירה</h1>
+      <div style="width:38px;"></div>
+    </div>
+    <div class="result-card" id="stage1-card"></div>
+    <div class="sticky-bottom">
+      <button class="btn btn-accent" onclick="fetchOptions()">דרכי פעולה</button>
+    </div>
+  </div>
+
+  <!-- STAGE 2 OPTIONS -->
+  <div class="view" id="view-stage2">
+    <div class="topbar">
+      <div class="icon-btn" onclick="goBack()">‹</div>
+      <h1 style="font-size:19px;">דרכי פעולה</h1>
+      <div style="width:38px;"></div>
+    </div>
+    <p class="msg-quiet">בחרו מה שהכי מתאים לכם. אין כאן תשובה אחת נכונה.</p>
+    <div id="options-list" style="margin-top:16px;"></div>
+  </div>
+
+  <!-- CONFIRMATION AFTER CHOOSING AN ACTION -->
+  <div class="view" id="view-chosen">
+    <div class="topbar">
+      <div class="icon-btn" onclick="backToOptions()">‹</div>
+      <h1 style="font-size:19px;">נבחר</h1>
+      <div style="width:38px;"></div>
+    </div>
+    <div class="result-card" id="chosen-card"></div>
+    <p class="msg-quiet" style="margin:0 20px 20px;">עכשיו זה עליכם. נסו את זה, ותוך יום-יומיים חזרו לתיק הזה כדי לספר מה קרה בפועל, זה החלק שהכי שווה.</p>
+    <div class="form-wrap" style="padding-top:0;">
+      <button class="btn" onclick="goTo('home')">חזרה לרשימת התיקים</button>
+      <button class="btn btn-outline" style="margin-top:10px;" onclick="goTo('new')">לפתוח מקרה נוסף</button>
+    </div>
+  </div>
+
+  <!-- CASE DETAIL (in progress / done) -->
+  <div class="view" id="view-detail">
+    <div class="topbar">
+      <div class="icon-btn" onclick="goBack()">‹</div>
+      <h1 style="font-size:19px;">התיק</h1>
+      <div style="width:38px;"></div>
+    </div>
+    <div id="detail-content"></div>
   </div>
 
 </div>
+
+<script>
+const API_URL = "/.netlify/functions/claude";
+const MODEL = "claude-sonnet-4-6";
+const FAST_MODEL = "claude-haiku-4-5-20251001";
+const STORAGE_KEY = "hafshara_cases_v1";
+const ONBOARD_KEY = "hafshara_onboarded_v1";
+
+let cases = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+let activeCaseId = null;
+let viewStack = [];
+const TRANSIENT_VIEWS = ['loading', 'chosen'];
+
+function saveCases(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(cases)); }
+function getCase(id){ return cases.find(c => c.id === id); }
+
+function goTo(viewName, isBack){
+  const current = document.querySelector('.view.active');
+  if(!isBack && current){
+    const currentName = current.id.replace('view-', '');
+    if(currentName !== viewName && !TRANSIENT_VIEWS.includes(currentName)){
+      viewStack.push(currentName);
+    }
+  }
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + viewName).classList.add('active');
+  if(viewName === 'home') renderHome();
+  window.scrollTo(0,0);
+}
+
+function goBack(){
+  let prev = viewStack.pop();
+  while(prev && TRANSIENT_VIEWS.includes(prev)){ prev = viewStack.pop(); }
+  goTo(prev || 'home', true);
+}
+
+function startFirstCase(){
+  localStorage.setItem(ONBOARD_KEY, "1");
+  goTo('new');
+}
+
+/* ---------- word counter ---------- */
+const inputEl = document.getElementById('case-input');
+const counterEl = document.getElementById('word-counter');
+inputEl.addEventListener('input', () => {
+  const words = inputEl.value.trim().split(/\s+/).filter(Boolean);
+  counterEl.textContent = words.length + ' / 100 מילים';
+  counterEl.classList.toggle('over', words.length > 100);
+});
+
+/* ---------- band helper ---------- */
+function bandColor(intensity){
+  if(intensity <= 3) return {main:'#3C5A52', soft:'#DDE6E2'};
+  if(intensity <= 6) return {main:'#B8873A', soft:'#F3E6D2'};
+  return {main:'#A6432E', soft:'#F3DED8'};
+}
+
+function gaugeHTML(intensity, size){
+  const pct = intensity*10;
+  const c = bandColor(intensity);
+  const ringSize = size || 46;
+  const innerSize = ringSize - 12;
+  return `<div class="gauge" style="width:${ringSize}px;height:${ringSize}px;background:conic-gradient(${c.main} ${pct}%, var(--border) 0);">
+    <div style="width:${innerSize}px;height:${innerSize}px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;">
+      <span style="color:${c.main};">${intensity}</span>
+    </div>
+  </div>`;
+}
+
+/* ---------- HOME RENDER ---------- */
+function renderHome(){
+  const list = document.getElementById('home-list');
+  const insightSlot = document.getElementById('insight-slot');
+  insightSlot.innerHTML = '';
+
+  const doneCases = cases.filter(c => c.status === 'done' && c.outcomeCategory && c.outcomeCategory !== 'ויתרתי');
+  if(doneCases.length >= 3){
+    const outcomeProxy = {'הסתדר':1,'חלקית':4,'לא הלך':7};
+    let totalGap = 0, count = 0;
+    doneCases.forEach(c => {
+      if(outcomeProxy[c.outcomeCategory] !== undefined){
+        totalGap += (c.intensity - outcomeProxy[c.outcomeCategory]);
+        count++;
+      }
+    });
+    const avgGap = count ? (totalGap/count) : 0;
+    if(count > 0){
+      const positiveShare = doneCases.filter(c => (c.intensity - outcomeProxy[c.outcomeCategory]) > 1).length;
+      insightSlot.innerHTML = `<div class="insight-box">
+        מתוך <b>${count}</b> תיקים שנסגרו, ב-<b>${positiveShare}</b> מהם החשש המקורי היה גבוה משמעותית מהתוצאה בפועל.
+        בממוצע, פער של <b>${avgGap.toFixed(1)}</b> נקודות בין החשש לתוצאה.
+      </div>`;
+    }
+  }
+
+  if(cases.length === 0){
+    list.innerHTML = `<div class="empty-state">
+      <p>אין כרגע תיקים פתוחים.<br>משהו מעיק עליכם? זה הזמן לתת לזה שם.</p>
+    </div>`;
+    return;
+  }
+
+  const sorted = [...cases].sort((a,b) => (b.updatedAt||0) - (a.updatedAt||0));
+  list.innerHTML = sorted.map(c => {
+    let badgeHtml = '';
+    if(c.status === 'awaiting_action') badgeHtml = '<span class="badge badge-amber">לבחור דרך פעולה</span>';
+    else if(c.status === 'in_progress') badgeHtml = '<span class="badge badge-teal">מה יצא מזה?</span>';
+    else if(c.status === 'done') badgeHtml = `<span class="badge badge-done">${c.outcomeCategory || 'נסגר'}</span>`;
+    const title = c.relation ? c.relation : 'תיק';
+    return `<div class="case-card" onclick="openCase('${c.id}')">
+      ${gaugeHTML(c.intensity || 1)}
+      <div class="card-body">
+        <div class="card-title">${escapeHtml(title)}</div>
+        <div class="card-sub">${escapeHtml((c.text||'').slice(0,40))}${(c.text||'').length>40?'…':''}</div>
+      </div>
+      ${badgeHtml}
+    </div>`;
+  }).join('');
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+/* ---------- API helper ---------- */
+async function callClaude(systemPrompt, userText, maxTokens, model){
+  try{
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: model || MODEL,
+        max_tokens: maxTokens || 1000,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userText }]
+      })
+    });
+    const data = await response.json();
+    const textBlock = (data.content || []).find(b => b.type === 'text');
+    let raw = textBlock ? textBlock.text : '{}';
+    raw = raw.replace(/```json|```/g, '').trim();
+    const first = raw.indexOf('{');
+    const last = raw.lastIndexOf('}');
+    if(first !== -1 && last !== -1 && last > first){
+      raw = raw.slice(first, last + 1);
+    }
+    return JSON.parse(raw);
+  }catch(e){
+    console.error('callClaude failed', e);
+    return null;
+  }
+}
+
+/* ---------- STAGE 1 ---------- */
+async function submitCase(){
+  const text = inputEl.value.trim();
+  const words = text.split(/\s+/).filter(Boolean);
+  if(words.length === 0){ return; }
+  if(words.length > 100){ alert('נסו לקצר קצת, עד 100 מילה.'); return; }
+
+  const id = 'c' + Date.now();
+  const newCase = { id, text, createdAt: Date.now(), updatedAt: Date.now(), status: 'analyzing' };
+  cases.push(newCase);
+  saveCases();
+  activeCaseId = id;
+
+  goTo('loading');
+  document.getElementById('loading-text').textContent = 'בודקים את התמונה המלאה...';
+
+  const systemPrompt = `אתה עוזר שמנתח סיטואציות של "אי נעימות" בין־אישית (מבוכה, חוב חברתי לא סגור, שתיקה, התנצלות תלויה וכו'). קיבלת תיאור חופשי בעברית של מה שקרה. עליך להחזיר אך ורק אובייקט JSON תקין, ללא טקסט נוסף וללא markdown, במבנה הבא:
+{"relation": "תיאור קצר של הקשר עם הצד השני, 1-3 מילים, לדוגמה 'אח' או 'עמית לעבודה'", "intensity": מספר שלם בין 1 ל-10, "reasoning": "משפט אחד קצר בעברית שמסביר את הציון, המבוסס על שילוב של קרבת הקשר, כמה זמן עבר, מי אחראי למצב, האם היו עדים, והאם זה מקרה חד־פעמי או דפוס חוזר", "spotlightLine": "משפט אחד קצר וכן בעברית שמעריך איך הסיטואציה כנראה נראית מנקודת המבט של הצד השני. אל תרגיע באופן אוטומטי, היה מכויל ומדויק: לפעמים התשובה היא שזה חמור פחות ממה שנדמה, ולפעמים ההפך."}
+חשב את העוצמה על ידי שקלול אמיתי של הגורמים, לא נוסחה שרירותית. קרבה גבוהה מעלה משקל אך גם מעלה סלחנות. זמן רב שעבר מעלה עוצמה. דפוס חוזר מעלה עוצמה יותר ממקרה חד־פעמי.`;
+
+  const result = await callClaude(systemPrompt, text, 600);
+  const caseObj = getCase(id);
+  if(result && typeof result.intensity === 'number'){
+    caseObj.relation = result.relation || '';
+    caseObj.intensity = Math.max(1, Math.min(10, Math.round(result.intensity)));
+    caseObj.reasoning = result.reasoning || '';
+    caseObj.spotlightLine = result.spotlightLine || '';
+    caseObj.status = 'awaiting_action';
+  } else {
+    caseObj.relation = 'תיק';
+    caseObj.intensity = 5;
+    caseObj.reasoning = 'לא הצלחנו לנתח באופן מלא, אפשר להמשיך בכל זאת.';
+    caseObj.spotlightLine = '';
+    caseObj.status = 'awaiting_action';
+  }
+  caseObj.updatedAt = Date.now();
+  saveCases();
+  inputEl.value = '';
+  counterEl.textContent = '0 / 100 מילים';
+  renderStage1(caseObj);
+  goTo('stage1');
+}
+
+function renderStage1(c){
+  const band = bandColor(c.intensity);
+  document.getElementById('stage1-card').innerHTML = `
+    <div class="relation-chip">${escapeHtml(c.relation || 'תיק')}</div>
+    <div class="big-gauge" style="background:conic-gradient(${band.main} ${c.intensity*10}%, var(--border) 0);">
+      <div class="big-gauge-inner">
+        <div class="num" style="color:${band.main}">${c.intensity}</div>
+        <div class="of10">מתוך 10</div>
+      </div>
+    </div>
+    <p class="reasoning">${escapeHtml(c.reasoning || '')}</p>
+    ${c.spotlightLine ? `<div class="spotlight"><b>איך זה כנראה נראה מהצד השני:</b><br>${escapeHtml(c.spotlightLine)}</div>` : ''}
+  `;
+}
+
+/* ---------- STAGE 2 ---------- */
+async function fetchOptions(){
+  const c = getCase(activeCaseId);
+  if(!c) return;
+
+  if(c.options && c.options.length){
+    renderOptions(c);
+    goTo('stage2');
+    return;
+  }
+
+  goTo('loading');
+  document.getElementById('loading-text').textContent = 'מחפשים דרכי פעולה אפשריות...';
+
+  const systemPrompt = `אתה עוזר שמציע דרכי פעולה מעשיות לסגירת "אי נעימות" בין־אישית. קיבלת תיאור מקרה, את הקשר עם הצד השני, ואת ציון העוצמה שלו. עליך להחזיר אך ורק אובייקט JSON תקין, ללא טקסט נוסף וללא markdown, במבנה הבא:
+{"options": [ {"title": "כותרת קצרה של הפעולה, 2-4 מילים", "description": "הסבר קצר ומעשי מה עושים בפועל", "effort": "קל" או "בינוני" או "גבוה", "expectedOutcome": "משפט אחד על מה זה כנראה ישיג, כולל מחיר או סיכון אם רלוונטי", "message": "נוסח הודעה מוכן לשליחה בעברית, טבעי ולא רשמי מדי, או null אם לא רלוונטי לאפשרות הזו"} ]}
+החזר בדיוק 3 אפשרויות, לא יותר. האפשרות האחרונה חייבת תמיד להיות "לא לעשות כלום", עם expectedOutcome שמתאר בכנות את המחיר האמיתי של אי־פעולה, לא רק דחייה שלה. אל תמליץ תמיד על אותה הפעולה, התאם את האפשרויות לעוצמה ולסוג הקשר. שמור על כל שדה קצר וממוקד: description עד 15 מילה, expectedOutcome עד 12 מילה, message עד 25 מילה. אל תוסיף הסברים או מבוא, רק את אובייקט ה-JSON.`;
+
+  const userText = `תיאור המקרה: ${c.text}\nקשר: ${c.relation}\nעוצמה: ${c.intensity}/10\nנימוק: ${c.reasoning}`;
+  const result = await callClaude(systemPrompt, userText, 1100, FAST_MODEL);
+
+  if(result && Array.isArray(result.options)){
+    c.options = result.options;
+  } else {
+    c.options = [{title:'לשלוח הודעה קצרה', description:'לפנות ישירות ולומר את מה שיש להגיד.', effort:'קל', expectedOutcome:'סביר שהמצב יתבהר מהר.', message:null},
+                 {title:'לא לעשות כלום', description:'להשאיר את זה כמו שזה.', effort:'קל', expectedOutcome:'העניין עלול להמשיך ללוות אתכם.', message:null}];
+  }
+  c.updatedAt = Date.now();
+  saveCases();
+  renderOptions(c);
+  goTo('stage2');
+}
+
+function renderOptions(c){
+  const list = document.getElementById('options-list');
+  list.innerHTML = c.options.map((opt, idx) => {
+    const isNoop = opt.title && opt.title.includes('לא לעשות');
+    const effortClass = 'effort-' + (opt.effort || 'בינוני');
+    return `<div class="option-card ${isNoop ? 'noop' : ''}" onclick="chooseOption(${idx})">
+      <div class="option-top">
+        <div class="option-title">${escapeHtml(opt.title || '')}</div>
+        <div class="effort-chip ${effortClass}">${escapeHtml(opt.effort || '')}</div>
+      </div>
+      <div class="option-desc">${escapeHtml(opt.description || '')}</div>
+      <div class="option-outcome"><b>מה זה כנראה ישיג:</b> ${escapeHtml(opt.expectedOutcome || '')}</div>
+      ${opt.message ? `<div class="message-box" id="msg-${idx}">${escapeHtml(opt.message)}</div>
+        <button class="copy-btn" onclick="event.stopPropagation(); copyMessage(${idx})">העתקת ההודעה</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function copyMessage(idx){
+  const c = getCase(activeCaseId);
+  const msg = c.options[idx].message;
+  navigator.clipboard.writeText(msg).then(() => {
+    alert('ההודעה הועתקה');
+  });
+}
+
+function chooseOption(idx){
+  const c = getCase(activeCaseId);
+  c.chosenOption = c.options[idx];
+  c.status = 'in_progress';
+  c.updatedAt = Date.now();
+  saveCases();
+  renderChosen(c);
+  goTo('chosen');
+}
+
+function backToOptions(){
+  const c = getCase(activeCaseId);
+  c.status = 'awaiting_action';
+  c.chosenOption = null;
+  saveCases();
+  renderOptions(c);
+  goTo('stage2');
+}
+
+function renderChosen(c){
+  document.getElementById('chosen-card').innerHTML = `
+    <div class="option-title" style="margin-bottom:8px;">${escapeHtml(c.chosenOption.title)}</div>
+    <p class="option-desc" style="text-align:right;">${escapeHtml(c.chosenOption.description)}</p>
+  `;
+}
+
+/* ---------- CASE DETAIL / STAGE 3 ---------- */
+function openCase(id){
+  activeCaseId = id;
+  const c = getCase(id);
+  if(c.status === 'analyzing'){
+    goTo('home');
+    return;
+  }
+  if(c.status === 'awaiting_action'){
+    renderStage1(c);
+    goTo('stage1');
+    return;
+  }
+  renderDetail(c);
+  goTo('detail');
+}
+
+function renderDetail(c){
+  const el = document.getElementById('detail-content');
+  const band = bandColor(c.intensity);
+  let html = `
+    <div class="result-card" style="margin-top:6px;">
+      <div class="relation-chip">${escapeHtml(c.relation || '')}</div>
+      <div class="big-gauge" style="width:80px;height:80px;background:conic-gradient(${band.main} ${c.intensity*10}%, var(--border) 0);">
+        <div class="big-gauge-inner" style="width:60px;height:60px;">
+          <div class="num" style="font-size:22px;color:${band.main}">${c.intensity}</div>
+        </div>
+      </div>
+      <p class="reasoning">${escapeHtml(c.text)}</p>
+    </div>`;
+
+  if(c.status === 'in_progress'){
+    html += `<div class="section-label">הדרך שבחרתם</div>
+      <div class="option-card" style="cursor:default;">
+        <div class="option-title">${escapeHtml(c.chosenOption.title)}</div>
+        <div class="option-desc">${escapeHtml(c.chosenOption.description)}</div>
+      </div>
+      <div class="section-label">מה קרה בפועל?</div>
+      <p class="msg-quiet" style="margin-bottom:14px;">עשיתם את זה? מה יצא מזה?</p>
+      <div class="outcome-grid" id="outcome-grid">
+        ${['הסתדר','חלקית','לא הלך','ויתרתי'].map(o => `<div class="outcome-opt" onclick="selectOutcome(this,'${o}')">${o}</div>`).join('')}
+      </div>
+      <div class="form-wrap" style="padding-top:0;">
+        <textarea id="outcome-note" rows="3" placeholder="שורה אחת, אם בא לכם (לא חובה)"></textarea>
+      </div>
+      <div class="sticky-bottom">
+        <button class="btn btn-accent" onclick="saveOutcome()">לשמור ולסגור תיק</button>
+      </div>`;
+  } else if(c.status === 'done'){
+    html += `<div class="section-label">איך זה נגמר</div>
+      <div class="option-card" style="cursor:default;">
+        <div class="option-title">${escapeHtml(c.outcomeCategory || '')}</div>
+        ${c.outcomeNote ? `<div class="option-desc">${escapeHtml(c.outcomeNote)}</div>` : ''}
+        <div class="option-outcome"><b>העוצמה שהוערכה מראש:</b> ${c.intensity}/10</div>
+      </div>`;
+  }
+  el.innerHTML = html;
+}
+
+let selectedOutcome = null;
+function selectOutcome(el, value){
+  selectedOutcome = value;
+  document.querySelectorAll('#outcome-grid .outcome-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function saveOutcome(){
+  if(!selectedOutcome){ alert('בחרו איך זה נגמר'); return; }
+  const c = getCase(activeCaseId);
+  c.outcomeCategory = selectedOutcome;
+  c.outcomeNote = document.getElementById('outcome-note').value.trim();
+  c.status = 'done';
+  c.updatedAt = Date.now();
+  saveCases();
+  selectedOutcome = null;
+  goTo('home');
+}
+
+/* ---------- INFO / RESET ---------- */
+function showInfo(){
+  document.getElementById('modal-overlay').style.display = 'flex';
+}
+function closeModal(){
+  document.getElementById('modal-overlay').style.display = 'none';
+}
+function resetApp(){
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(ONBOARD_KEY);
+  cases = [];
+  viewStack = [];
+  closeModal();
+  goTo('onboarding');
+}
+
+/* ---------- INIT ---------- */
+(function init(){
+  if(localStorage.getItem(ONBOARD_KEY)){
+    goTo('home');
+  } else {
+    document.getElementById('view-onboarding').classList.add('active');
+  }
+})();
+</script>
 </body>
 </html>
