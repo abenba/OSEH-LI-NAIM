@@ -257,4 +257,559 @@
     </p>
     <p class="lede-q">האם לא הגיע הזמן לפרק את זה? האם יכול להיות, בכלל, שהפרוש שלכם לכל הסיטואציה מוטעה? בואו ננסה לסגור את הסיפור.</p>
     <button class="btn" onclick="startFirstCase()">פותחים תיק ראשון</button>
-    <button class="btn-ghost" style="width:100%; margin-top:6px; font-size:13px;"
+    <button class="btn-ghost" style="width:100%; margin-top:6px; font-size:13px;" onclick="showAbout()">אודות</button>
+  </div>
+
+  <!-- HOME -->
+  <div class="view" id="view-home">
+    <div class="topbar">
+      <div class="brand-row">
+        <svg class="brand-icon" width="20" height="20" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M24 10a10 10 0 1 0 2 8" stroke="#3C5A52" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="26" cy="8" r="2.6" fill="#3C5A52"/>
+        </svg>
+        <h1>עושה לי נעים</h1>
+      </div>
+      <div class="icon-btn" onclick="showInfo()">i</div>
+    </div>
+    <div id="insight-slot"></div>
+    <div id="home-list"></div>
+    <div class="fab-wrap"><button class="fab" onclick="goTo('new')" aria-label="תיק חדש">+</button></div>
+  </div>
+
+  <!-- INFO / RESET MODAL -->
+  <div id="modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(43,43,38,.45); z-index:50; align-items:center; justify-content:center; padding:24px;">
+    <div style="background:var(--card); border-radius:var(--radius); padding:24px; max-width:340px; box-shadow:var(--shadow);">
+      <p style="font-size:14px; line-height:1.7; margin-bottom:20px;">כל הנתונים נשמרים רק במכשיר שלך, ולא נשלחים לשום מקום.</p>
+      <p style="font-size:13px; line-height:1.7; color:var(--ink-soft); margin-bottom:20px;">אפשר לאפס את כל הנתונים ולהתחיל ממסך הפתיחה מחדש (לצורך בדיקה).</p>
+      <button class="btn" style="background:var(--warn); margin-bottom:10px;" onclick="resetApp()">איפוס כל הנתונים</button>
+      <button class="btn btn-ghost" onclick="closeModal()">סגירה</button>
+    </div>
+  </div>
+
+  <!-- ABOUT MODAL -->
+  <div id="about-overlay" style="display:none; position:fixed; inset:0; background:rgba(43,43,38,.45); z-index:50; align-items:center; justify-content:center; padding:24px;">
+    <div style="background:var(--card); border-radius:var(--radius); padding:26px; max-width:380px; max-height:80vh; overflow-y:auto; box-shadow:var(--shadow); text-align:right;">
+      <div class="brand" style="font-size:20px; margin-bottom:14px;">עושה לי נעים</div>
+      <p style="font-size:14px; line-height:1.75; margin-bottom:14px;">זה קורה לכם לא פעם: משהו שלא נאמר, חוב קטן שלא שולם, התנצלות שנתקעה, סירוב שלא יצא מהפה, הודעה שלא נענתה מספיק זמן עד שכבר לא מסתדר לענות. מי לא מכיר? קוראים לזה אי-נעימות.</p>
+      <p style="font-size:14px; line-height:1.75; margin-bottom:14px;">האפליקציה מציעה דרך לסגור את הסיפור הזה, לא בעצות כלליות אלא בתהליך קצר שנשען על הבנה פסיכולוגית אמיתית של איך אנחנו מעריכים יתר על המידה את מה שהצד השני חושב עלינו.</p>
+      <p style="font-size:14px; line-height:1.75; margin-bottom:14px;">מתארים בכמה משפטים מה קרה, והאפליקציה משקללת את העוצמה האמיתית של הרגע, לא לפי תחושת בטן אלא לפי קרבה, זמן שעבר ואחריות, ולצידה מציעה זווית מהצד השני שלרוב לא חשבתם עליה.</p>
+      <p style="font-size:14px; line-height:1.75; margin-bottom:14px;">משם, שלוש דרכי פעולה מוחשיות, כולל האפשרות הכי כנה מכולן: לא לעשות כלום, מה שכמובן גובה מחיר. הכל גלוי.</p>
+      <p style="font-size:14px; line-height:1.75; margin-bottom:14px;">ולפני שממש עושים, אפשר לתרגל את הרגע עצמו בשיחה קצרה שבה הבינה המלאכותית מגלמת את הצד השני, כדי לגלות שהוא כמעט תמיד קל בהרבה ממה שדמיינתם.</p>
+      <p style="font-size:14px; line-height:1.75; margin-bottom:20px;">בסוף התהליך, האפליקציה עשויה להראות לכם משהו שאי אפשר לראות לבד: כמה מהחששות שלכם היו גדולים בהרבה מהמציאות.</p>
+      <button class="btn btn-ghost" onclick="closeAbout()">סגירה</button>
+    </div>
+  </div>
+
+  <!-- STAGE 1: input -->
+  <div class="view" id="view-new">
+    <div class="topbar">
+      <div class="icon-btn" onclick="goBack()">‹</div>
+      <h1 style="font-size:19px;">מה קרה?</h1>
+      <div style="width:38px;"></div>
+    </div>
+    <div class="form-wrap">
+      <label class="field-label">ספרו בקצרה מה קרה ומול מי (עד 100 מילה)</label>
+      <textarea id="case-input" rows="7" placeholder="לדוגמה: לפני שבועיים ביטלתי בהודעה קצרה ארוחה עם חברה קרובה, בלי הסבר טוב. מאז לא דיברנו."></textarea>
+      <div class="counter" id="word-counter">0 / 100 מילים</div>
+    </div>
+    <div class="sticky-bottom">
+      <button class="btn" id="submit-case-btn" onclick="submitCase()">הערכת האירוע</button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="view" id="view-loading">
+    <div class="loading-wrap">
+      <div class="spinner"></div>
+      <p id="loading-text">בודקים את התמונה המלאה...</p>
+    </div>
+  </div>
+
+  <!-- STAGE 1 RESULT -->
+  <div class="view" id="view-stage1">
+    <div class="topbar">
+      <div class="icon-btn" onclick="goBack()">‹</div>
+      <h1 style="font-size:19px;">מה קורה כעת? הערכה זעירה</h1>
+      <div style="width:38px;"></div>
+    </div>
+    <div class="result-card" id="stage1-card"></div>
+    <div class="sticky-bottom">
+      <button class="btn btn-accent" onclick="fetchOptions()">דרכי פעולה</button>
+    </div>
+  </div>
+
+  <!-- STAGE 2 OPTIONS -->
+  <div class="view" id="view-stage2">
+    <div class="topbar">
+      <div class="icon-btn" onclick="goBack()">‹</div>
+      <h1 style="font-size:19px;">דרכי פעולה</h1>
+      <div style="width:38px;"></div>
+    </div>
+    <p class="msg-quiet" style="font-weight:700; color:var(--ink); font-size:15px;">בחרו מה שהכי מתאים לכם. אין כאן תשובה אחת נכונה.</p>
+    <div id="options-list" style="margin-top:16px;"></div>
+  </div>
+
+  <!-- CONFIRMATION AFTER CHOOSING AN ACTION -->
+  <div class="view" id="view-chosen">
+    <div class="topbar">
+      <div class="icon-btn" onclick="backToOptions()">‹</div>
+      <h1 style="font-size:19px;">נבחר</h1>
+      <div style="width:38px;"></div>
+    </div>
+    <div class="result-card" id="chosen-card"></div>
+    <p class="msg-quiet" style="margin:0 20px 20px;">עכשיו זה עליכם. נסו את זה, ותוך יום-יומיים חזרו לתיק הזה כדי לספר מה קרה בפועל, זה החלק שהכי שווה.</p>
+    <div class="form-wrap" style="padding-top:0;" id="chosen-actions">
+      <button class="btn" onclick="goTo('home')">חזרה לרשימת התיקים</button>
+      <button class="btn btn-outline" style="margin-top:10px;" onclick="goTo('new')">לפתוח מקרה נוסף</button>
+    </div>
+  </div>
+
+  <!-- REHEARSAL ROOM -->
+  <div class="view" id="view-rehearse">
+    <div class="topbar">
+      <div class="icon-btn" onclick="goTo('chosen')">‹</div>
+      <h1 style="font-size:19px;">חדר החזרות</h1>
+      <div style="width:38px;"></div>
+    </div>
+    <div id="rehearse-intro-slot"></div>
+    <div class="chat-wrap" id="chat-messages"></div>
+    <div id="rehearse-input-slot"></div>
+  </div>
+
+  <!-- CASE DETAIL (in progress / done) -->
+  <div class="view" id="view-detail">
+    <div class="topbar">
+      <div class="icon-btn" onclick="goBack()">‹</div>
+      <h1 style="font-size:19px;">התיק</h1>
+      <div style="width:38px;"></div>
+    </div>
+    <div id="detail-content"></div>
+  </div>
+
+</div>
+
+<script>
+const API_URL = "/.netlify/functions/claude";
+const MODEL = "claude-sonnet-4-6";
+const FAST_MODEL = "claude-haiku-4-5-20251001";
+const STORAGE_KEY = "hafshara_cases_v1";
+const ONBOARD_KEY = "hafshara_onboarded_v1";
+
+let cases = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+let activeCaseId = null;
+let viewStack = [];
+const TRANSIENT_VIEWS = ['loading', 'chosen'];
+
+function saveCases(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(cases)); }
+function getCase(id){ return cases.find(c => c.id === id); }
+
+function goTo(viewName, isBack){
+  const current = document.querySelector('.view.active');
+  if(!isBack && current){
+    const currentName = current.id.replace('view-', '');
+    if(currentName !== viewName && !TRANSIENT_VIEWS.includes(currentName)){
+      viewStack.push(currentName);
+    }
+  }
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + viewName).classList.add('active');
+  if(viewName === 'home') renderHome();
+  window.scrollTo(0,0);
+}
+
+function goBack(){
+  let prev = viewStack.pop();
+  while(prev && TRANSIENT_VIEWS.includes(prev)){ prev = viewStack.pop(); }
+  goTo(prev || 'home', true);
+}
+
+function startFirstCase(){
+  localStorage.setItem(ONBOARD_KEY, "1");
+  goTo('new');
+}
+
+/* ---------- word counter ---------- */
+const inputEl = document.getElementById('case-input');
+const counterEl = document.getElementById('word-counter');
+inputEl.addEventListener('input', () => {
+  const words = inputEl.value.trim().split(/\s+/).filter(Boolean);
+  counterEl.textContent = words.length + ' / 100 מילים';
+  counterEl.classList.toggle('over', words.length > 100);
+});
+
+/* ---------- band helper ---------- */
+function bandColor(intensity){
+  if(intensity <= 3) return {main:'#3C5A52', soft:'#DDE6E2'};
+  if(intensity <= 6) return {main:'#B8873A', soft:'#F3E6D2'};
+  return {main:'#A6432E', soft:'#F3DED8'};
+}
+
+function gaugeHTML(intensity, size){
+  const pct = intensity*10;
+  const c = bandColor(intensity);
+  const ringSize = size || 46;
+  const innerSize = ringSize - 12;
+  return `<div class="gauge" style="width:${ringSize}px;height:${ringSize}px;background:conic-gradient(${c.main} ${pct}%, var(--border) 0);">
+    <div style="width:${innerSize}px;height:${innerSize}px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;">
+      <span style="color:${c.main};">${intensity}</span>
+    </div>
+  </div>`;
+}
+
+/* ---------- interest-over-time helper ---------- */
+function daysOpen(c){
+  return Math.floor((Date.now() - (c.createdAt || Date.now())) / 86400000);
+}
+function daysLabel(days){
+  if(days <= 0) return 'נפתח היום';
+  if(days === 1) return 'פתוח יום אחד';
+  return `פתוח ${days} ימים`;
+}
+function lerpColor(hexA, hexB, t){
+  const a = parseInt(hexA.slice(1), 16), b = parseInt(hexB.slice(1), 16);
+  const ar = (a>>16)&255, ag = (a>>8)&255, ab = a&255;
+  const br = (b>>16)&255, bg = (b>>8)&255, bb = b&255;
+  const r = Math.round(ar + (br-ar)*t), g = Math.round(ag + (bg-ag)*t), bl = Math.round(ab + (bb-ab)*t);
+  return `rgb(${r},${g},${bl})`;
+}
+function agingBorderColor(days){
+  const t = Math.min(days, 21) / 21;
+  return lerpColor('#DDD5C7', '#A6432E', t);
+}
+
+/* ---------- HOME RENDER ---------- */
+function renderHome(){
+  const list = document.getElementById('home-list');
+  const insightSlot = document.getElementById('insight-slot');
+  insightSlot.innerHTML = '';
+
+  const doneCases = cases.filter(c => c.status === 'done' && c.outcomeCategory && c.outcomeCategory !== 'ויתרתי');
+  if(doneCases.length >= 3){
+    const outcomeProxy = {'הסתדר':1,'חלקית':4,'לא הלך':7,'נסגר מעצמו':0};
+    let totalGap = 0, count = 0;
+    doneCases.forEach(c => {
+      if(outcomeProxy[c.outcomeCategory] !== undefined){
+        totalGap += (c.intensity - outcomeProxy[c.outcomeCategory]);
+        count++;
+      }
+    });
+    const avgGap = count ? (totalGap/count) : 0;
+    if(count > 0){
+      const positiveShare = doneCases.filter(c => (c.intensity - outcomeProxy[c.outcomeCategory]) > 1).length;
+      const selfResolvedCount = doneCases.filter(c => c.outcomeCategory === 'נסגר מעצמו').length;
+      insightSlot.innerHTML = `<div class="insight-box">
+        מתוך <b>${count}</b> תיקים שנסגרו, ב-<b>${positiveShare}</b> מהם החשש המקורי היה גבוה משמעותית מהתוצאה בפועל.
+        בממוצע, פער של <b>${avgGap.toFixed(1)}</b> נקודות בין החשש לתוצאה.
+        ${selfResolvedCount > 0 ? `<br>ו-<b>${selfResolvedCount}</b> מהם נסגרו מעצמם, בלי שעשיתם דבר.` : ''}
+      </div>`;
+    }
+  }
+
+  if(cases.length === 0){
+    list.innerHTML = `<div class="empty-state">
+      <p>אין כרגע תיקים פתוחים.<br>משהו מעיק עליכם? זה הזמן לתת לזה שם.</p>
+    </div>`;
+    return;
+  }
+
+  const sorted = [...cases].sort((a,b) => (b.updatedAt||0) - (a.updatedAt||0));
+  list.innerHTML = sorted.map(c => {
+    let badgeHtml = '';
+    if(c.status === 'awaiting_action') badgeHtml = '<span class="badge badge-amber">לבחור דרך פעולה</span>';
+    else if(c.status === 'in_progress') badgeHtml = '<span class="badge badge-teal">מה יצא מזה?</span>';
+    else if(c.status === 'done') badgeHtml = `<span class="badge badge-done">${c.outcomeCategory || 'נסגר'}</span>`;
+    const title = c.relation ? c.relation : 'תיק';
+    const isOpen = c.status !== 'done';
+    const borderStyle = isOpen ? `border-color:${agingBorderColor(daysOpen(c))};` : '';
+    const subLine = isOpen
+      ? `${escapeHtml((c.text||'').slice(0,28))}${(c.text||'').length>28?'…':''} · ${daysLabel(daysOpen(c))}`
+      : `${escapeHtml((c.text||'').slice(0,40))}${(c.text||'').length>40?'…':''}`;
+    return `<div class="case-card" style="${borderStyle}" onclick="openCase('${c.id}')">
+      ${gaugeHTML(c.intensity || 1)}
+      <div class="card-body">
+        <div class="card-title">${escapeHtml(title)}</div>
+        <div class="card-sub">${subLine}</div>
+      </div>
+      ${badgeHtml}
+    </div>`;
+  }).join('');
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+/* ---------- API helper ---------- */
+async function callClaude(systemPrompt, userText, maxTokens, model){
+  try{
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: model || MODEL,
+        max_tokens: maxTokens || 1000,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userText }]
+      })
+    });
+    const data = await response.json();
+    const textBlock = (data.content || []).find(b => b.type === 'text');
+    let raw = textBlock ? textBlock.text : '{}';
+    raw = raw.replace(/```json|```/g, '').trim();
+    const first = raw.indexOf('{');
+    const last = raw.lastIndexOf('}');
+    if(first !== -1 && last !== -1 && last > first){
+      raw = raw.slice(first, last + 1);
+    }
+    return JSON.parse(raw);
+  }catch(e){
+    console.error('callClaude failed', e);
+    return null;
+  }
+}
+
+/* ---------- STAGE 1 ---------- */
+async function submitCase(){
+  const text = inputEl.value.trim();
+  const words = text.split(/\s+/).filter(Boolean);
+  if(words.length === 0){ return; }
+  if(words.length > 100){ alert('נסו לקצר קצת, עד 100 מילה.'); return; }
+
+  const id = 'c' + Date.now();
+  const newCase = { id, text, createdAt: Date.now(), updatedAt: Date.now(), status: 'analyzing' };
+  cases.push(newCase);
+  saveCases();
+  activeCaseId = id;
+
+  goTo('loading');
+  document.getElementById('loading-text').textContent = 'בודקים את התמונה המלאה...';
+
+  const systemPrompt = `אתה עוזר שמנתח סיטואציות של "אי נעימות" בין־אישית (מבוכה, חוב חברתי לא סגור, שתיקה, התנצלות תלויה וכו'). קיבלת תיאור חופשי בעברית של מה שקרה. עליך להחזיר אך ורק אובייקט JSON תקין, ללא טקסט נוסף וללא markdown, במבנה הבא:
+{"relation": "תיאור קצר של הקשר עם הצד השני, 1-3 מילים, לדוגמה 'אח' או 'עמית לעבודה'", "intensity": מספר שלם בין 1 ל-10, "reasoning": "משפט אחד קצר בעברית שמסביר את הציון, המבוסס על שילוב של קרבת הקשר, כמה זמן עבר, מי אחראי למצב, האם היו עדים, והאם זה מקרה חד־פעמי או דפוס חוזר", "spotlightLine": "משפט אחד קצר וכן בעברית שמעריך איך הסיטואציה כנראה נראית מנקודת המבט של הצד השני. אל תרגיע באופן אוטומטי, היה מכויל ומדויק: לפעמים התשובה היא שזה חמור פחות ממה שנדמה, ולפעמים ההפך."}
+חשב את העוצמה על ידי שקלול אמיתי של הגורמים, לא נוסחה שרירותית. קרבה גבוהה מעלה משקל אך גם מעלה סלחנות. זמן רב שעבר מעלה עוצמה. דפוס חוזר מעלה עוצמה יותר ממקרה חד־פעמי.`;
+
+  const result = await callClaude(systemPrompt, text, 600);
+  const caseObj = getCase(id);
+  if(result && typeof result.intensity === 'number'){
+    caseObj.relation = result.relation || '';
+    caseObj.intensity = Math.max(1, Math.min(10, Math.round(result.intensity)));
+    caseObj.reasoning = result.reasoning || '';
+    caseObj.spotlightLine = result.spotlightLine || '';
+    caseObj.status = 'awaiting_action';
+  } else {
+    caseObj.relation = 'תיק';
+    caseObj.intensity = 5;
+    caseObj.reasoning = 'לא הצלחנו לנתח באופן מלא, אפשר להמשיך בכל זאת.';
+    caseObj.spotlightLine = '';
+    caseObj.status = 'awaiting_action';
+  }
+  caseObj.updatedAt = Date.now();
+  saveCases();
+  inputEl.value = '';
+  counterEl.textContent = '0 / 100 מילים';
+  renderStage1(caseObj);
+  goTo('stage1');
+}
+
+function renderStage1(c){
+  const band = bandColor(c.intensity);
+  document.getElementById('stage1-card').innerHTML = `
+    <div class="relation-chip">${escapeHtml(c.relation || 'תיק')}</div>
+    <div class="big-gauge" style="background:conic-gradient(${band.main} ${c.intensity*10}%, var(--border) 0);">
+      <div class="big-gauge-inner">
+        <div class="num" style="color:${band.main}">${c.intensity}</div>
+        <div class="of10">מתוך 10</div>
+      </div>
+    </div>
+    <p class="reasoning">${escapeHtml(c.reasoning || '')}</p>
+    ${c.spotlightLine ? `<div class="spotlight"><b>איך זה כנראה נראה מהצד השני:</b><br>${escapeHtml(c.spotlightLine)}</div>` : ''}
+    <div id="alt-slot" style="margin-top:14px;">
+      ${c.altInterpretation
+        ? `<div class="spotlight" style="border-right-color:var(--mid);"><b>ואולי בכלל...</b><br>${escapeHtml(c.altInterpretation)}</div>`
+        : `<button class="btn-ghost" style="width:auto; padding:6px 4px; font-size:13px;" onclick="fetchAltInterpretation()" id="alt-btn">ואולי בכלל...</button>`
+      }
+    </div>
+  `;
+}
+
+async function fetchAltInterpretation(){
+  const c = getCase(activeCaseId);
+  if(!c) return;
+  const btn = document.getElementById('alt-btn');
+  if(btn){ btn.textContent = 'חושבים...'; btn.disabled = true; }
+
+  const systemPrompt = `אתה עוזר שמציע נקודת מבט חלופית על סיטואציה של "אי נעימות" בין־אישית. קיבלת תיאור מקרה, את הקשר עם הצד השני, ואת ההערכה הנוכחית שלו. עליך להחזיר אך ורק אובייקט JSON תקין, ללא טקסט נוסף וללא markdown, במבנה הבא:
+{"alt": "משפט אחד קצר בעברית שמציע פרשנות חלופית וסבירה לאותה סיטואציה, שונה מהותית מהנימוק וממה שכבר נאמר, לא סתם ניסוח מחדש. יכולה להיות מרגיעה או לא, העיקר שתהיה אמינה ולא מומצאת."}
+עד 18 מילה. אל תוסיף הסברים, רק את אובייקט ה-JSON.`;
+  const userText = `תיאור המקרה: ${c.text}\nקשר: ${c.relation}\nעוצמה: ${c.intensity}/10\nנימוק קיים: ${c.reasoning}\nזווית קיימת: ${c.spotlightLine || ''}`;
+
+  const result = await callClaude(systemPrompt, userText, 300);
+  c.altInterpretation = (result && result.alt) ? result.alt : 'לא הצלחנו להציע זווית נוספת כרגע.';
+  saveCases();
+  renderStage1(c);
+}
+
+/* ---------- STAGE 2 ---------- */
+async function fetchOptions(){
+  const c = getCase(activeCaseId);
+  if(!c) return;
+
+  if(c.options && c.options.length){
+    renderOptions(c);
+    goTo('stage2');
+    return;
+  }
+
+  goTo('loading');
+  document.getElementById('loading-text').textContent = 'מחפשים דרכי פעולה אפשריות...';
+
+  const systemPrompt = `אתה עוזר שמציע דרכי פעולה מעשיות לסגירת "אי נעימות" בין־אישית. קיבלת תיאור מקרה, את הקשר עם הצד השני, ואת ציון העוצמה שלו. עליך להחזיר אך ורק אובייקט JSON תקין, ללא טקסט נוסף וללא markdown, במבנה הבא:
+{"options": [ {"title": "כותרת קצרה של הפעולה, 2-4 מילים", "description": "הסבר קצר ומעשי מה עושים בפועל", "effort": "קל" או "בינוני" או "גבוה", "expectedOutcome": "משפט אחד על מה זה כנראה ישיג, כולל מחיר או סיכון אם רלוונטי", "message": "נוסח הודעה מוכן לשליחה בעברית, טבעי ולא רשמי מדי, או null אם לא רלוונטי לאפשרות הזו"} ]}
+החזר בדיוק 3 אפשרויות, לא יותר. האפשרות האחרונה חייבת תמיד להיות "לא לעשות כלום", עם expectedOutcome שמתאר בכנות את המחיר האמיתי של אי־פעולה, לא רק דחייה שלה. אל תמליץ תמיד על אותה הפעולה, התאם את האפשרויות לעוצמה ולסוג הקשר. שמור על כל שדה קצר וממוקד: description עד 15 מילה, expectedOutcome עד 12 מילה, message עד 25 מילה. אל תוסיף הסברים או מבוא, רק את אובייקט ה-JSON.`;
+
+  const userText = `תיאור המקרה: ${c.text}\nקשר: ${c.relation}\nעוצמה: ${c.intensity}/10\nנימוק: ${c.reasoning}`;
+  const result = await callClaude(systemPrompt, userText, 1100);
+
+  if(result && Array.isArray(result.options)){
+    c.options = result.options;
+  } else {
+    c.options = [{title:'לשלוח הודעה קצרה', description:'לפנות ישירות ולומר את מה שיש להגיד.', effort:'קל', expectedOutcome:'סביר שהמצב יתבהר מהר.', message:null},
+                 {title:'לא לעשות כלום', description:'להשאיר את זה כמו שזה.', effort:'קל', expectedOutcome:'העניין עלול להמשיך ללוות אתכם.', message:null}];
+  }
+  c.updatedAt = Date.now();
+  saveCases();
+  renderOptions(c);
+  goTo('stage2');
+}
+
+function renderOptions(c){
+  const list = document.getElementById('options-list');
+  list.innerHTML = c.options.map((opt, idx) => {
+    const isNoop = opt.title && opt.title.includes('לא לעשות');
+    const effortClass = 'effort-' + (opt.effort || 'בינוני');
+    return `<div class="option-card ${isNoop ? 'noop' : ''}" onclick="chooseOption(${idx})">
+      <div class="option-top">
+        <div class="option-title">${escapeHtml(opt.title || '')}</div>
+        <div class="effort-chip ${effortClass}">${escapeHtml(opt.effort || '')}</div>
+      </div>
+      <div class="option-desc">${escapeHtml(opt.description || '')}</div>
+      <div class="option-outcome"><b>מה זה כנראה ישיג:</b> ${escapeHtml(opt.expectedOutcome || '')}</div>
+      ${opt.message ? `<div class="message-box" id="msg-${idx}">${escapeHtml(opt.message)}</div>
+        <button class="copy-btn" onclick="event.stopPropagation(); copyMessage(${idx})">העתקת ההודעה</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function copyMessage(idx){
+  const c = getCase(activeCaseId);
+  const msg = c.options[idx].message;
+  navigator.clipboard.writeText(msg).then(() => {
+    alert('ההודעה הועתקה');
+  });
+}
+
+function chooseOption(idx){
+  const c = getCase(activeCaseId);
+  c.chosenOption = c.options[idx];
+  c.status = 'in_progress';
+  c.updatedAt = Date.now();
+  saveCases();
+  renderChosen(c);
+  goTo('chosen');
+}
+
+function backToOptions(){
+  const c = getCase(activeCaseId);
+  c.status = 'awaiting_action';
+  c.chosenOption = null;
+  saveCases();
+  renderOptions(c);
+  goTo('stage2');
+}
+
+function renderChosen(c){
+  document.getElementById('chosen-card').innerHTML = `
+    <div class="option-title" style="margin-bottom:8px;">${escapeHtml(c.chosenOption.title)}</div>
+    <p class="option-desc" style="text-align:right;">${escapeHtml(c.chosenOption.description)}</p>
+  `;
+  const actionsEl = document.getElementById('chosen-actions');
+  const rehearseBtn = c.chosenOption.message
+    ? `<button class="btn btn-accent" style="margin-bottom:10px;" onclick="openRehearsal()">לתרגל רגע?</button>`
+    : '';
+  actionsEl.innerHTML = `
+    ${rehearseBtn}
+    <button class="btn" onclick="goTo('home')">חזרה לרשימת התיקים</button>
+    <button class="btn btn-outline" style="margin-top:10px;" onclick="goTo('new')">לפתוח מקרה נוסף</button>
+  `;
+}
+
+const REHEARSAL_MAX_EXCHANGES = 3;
+
+function openRehearsal(){
+  const c = getCase(activeCaseId);
+  if(!c) return;
+  if(!c.rehearsal){
+    c.rehearsal = { messages: [], exchanges: 0, closed: false };
+    saveCases();
+  }
+  renderRehearsal(c);
+  goTo('rehearse');
+}
+
+function renderRehearsal(c){
+  const introSlot = document.getElementById('rehearse-intro-slot');
+  const chatEl = document.getElementById('chat-messages');
+  const inputSlot = document.getElementById('rehearse-input-slot');
+
+  if(c.rehearsal.messages.length === 0){
+    introSlot.innerHTML = `
+      <p class="rehearse-intro">זה הרבה יותר פשוט ממה שאת/ה אולי חושבים.<br>בואו נתרגל לרגע.</p>
+      <p class="rehearse-sub">קלוד יגלם את ${escapeHtml(c.relation || 'הצד השני')}. כתבו מה הייתם אומרים.</p>
+    `;
+  } else {
+    introSlot.innerHTML = '';
+  }
+
+  chatEl.innerHTML = c.rehearsal.messages.map(m => `
+    <div class="chat-bubble ${m.role === 'me' ? 'me' : 'other'}">
+      ${m.role !== 'me' ? `<span class="who">${escapeHtml(c.relation || 'הצד השני')}</span>` : ''}
+      ${escapeHtml(m.text)}
+    </div>
+  `).join('');
+
+  if(c.rehearsal.closed){
+    inputSlot.innerHTML = `
+      <div class="rehearse-closing">ראיתם? זה נגמר הרבה יותר מהר ופשוט ממה שדמיינתם מראש.</div>
+      <div class="form-wrap"><button class="btn" onclick="goTo('chosen')">חזרה לתיק</button></div>
+    `;
+  } else {
+    inputSlot.innerHTML = `
+      <div class="chat-input-row">
+        <textarea id="rehearse-input" rows="1" placeholder="מה הייתם אומרים?"></textarea>
+        <button class="chat-send-btn" id="rehearse-send-btn" onclick="sendRehearsalMessage()" aria-label="שליחה">↑</button>
+      </div>
+    `;
+  }
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+async function sendRehearsalMessage(){
+  const c = getCase(activeCaseId);
+  if(!c) return;
+  const input = document.getElementById('rehearse-input');
+  const text = input.value.trim();
+  if(!text) return;
+
+  c.rehearsal.messages.push({ role: 'me', text });
+  saveCases();
+  renderRehearsal(c);
+
+  const sendBtn = document.getElementById('rehearse-send-btn');
+  if(sendBtn){ sendBtn.disabled = true; }
+  if(input){ input.disabled = true; }
+
+  const transcript = c.rehearsal.messages.map(m => `${m.role === 'me' ? 'המשתמש' : c.relation}: ${m.text}`).join('\n');
+  const systemPrompt = `אתה מגלם דמות
