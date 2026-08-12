@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -406,6 +405,27 @@ function gaugeHTML(intensity, size){
   </div>`;
 }
 
+/* ---------- interest-over-time helper ---------- */
+function daysOpen(c){
+  return Math.floor((Date.now() - (c.createdAt || Date.now())) / 86400000);
+}
+function daysLabel(days){
+  if(days <= 0) return 'נפתח היום';
+  if(days === 1) return 'פתוח יום אחד';
+  return `פתוח ${days} ימים`;
+}
+function lerpColor(hexA, hexB, t){
+  const a = parseInt(hexA.slice(1), 16), b = parseInt(hexB.slice(1), 16);
+  const ar = (a>>16)&255, ag = (a>>8)&255, ab = a&255;
+  const br = (b>>16)&255, bg = (b>>8)&255, bb = b&255;
+  const r = Math.round(ar + (br-ar)*t), g = Math.round(ag + (bg-ag)*t), bl = Math.round(ab + (bb-ab)*t);
+  return `rgb(${r},${g},${bl})`;
+}
+function agingBorderColor(days){
+  const t = Math.min(days, 21) / 21;
+  return lerpColor('#DDD5C7', '#A6432E', t);
+}
+
 /* ---------- HOME RENDER ---------- */
 function renderHome(){
   const list = document.getElementById('home-list');
@@ -414,7 +434,7 @@ function renderHome(){
 
   const doneCases = cases.filter(c => c.status === 'done' && c.outcomeCategory && c.outcomeCategory !== 'ויתרתי');
   if(doneCases.length >= 3){
-    const outcomeProxy = {'הסתדר':1,'חלקית':4,'לא הלך':7};
+    const outcomeProxy = {'הסתדר':1,'חלקית':4,'לא הלך':7,'נסגר מעצמו':0};
     let totalGap = 0, count = 0;
     doneCases.forEach(c => {
       if(outcomeProxy[c.outcomeCategory] !== undefined){
@@ -425,9 +445,11 @@ function renderHome(){
     const avgGap = count ? (totalGap/count) : 0;
     if(count > 0){
       const positiveShare = doneCases.filter(c => (c.intensity - outcomeProxy[c.outcomeCategory]) > 1).length;
+      const selfResolvedCount = doneCases.filter(c => c.outcomeCategory === 'נסגר מעצמו').length;
       insightSlot.innerHTML = `<div class="insight-box">
         מתוך <b>${count}</b> תיקים שנסגרו, ב-<b>${positiveShare}</b> מהם החשש המקורי היה גבוה משמעותית מהתוצאה בפועל.
         בממוצע, פער של <b>${avgGap.toFixed(1)}</b> נקודות בין החשש לתוצאה.
+        ${selfResolvedCount > 0 ? `<br>ו-<b>${selfResolvedCount}</b> מהם נסגרו מעצמם, בלי שעשיתם דבר.` : ''}
       </div>`;
     }
   }
@@ -446,11 +468,16 @@ function renderHome(){
     else if(c.status === 'in_progress') badgeHtml = '<span class="badge badge-teal">מה יצא מזה?</span>';
     else if(c.status === 'done') badgeHtml = `<span class="badge badge-done">${c.outcomeCategory || 'נסגר'}</span>`;
     const title = c.relation ? c.relation : 'תיק';
-    return `<div class="case-card" onclick="openCase('${c.id}')">
+    const isOpen = c.status !== 'done';
+    const borderStyle = isOpen ? `border-color:${agingBorderColor(daysOpen(c))};` : '';
+    const subLine = isOpen
+      ? `${escapeHtml((c.text||'').slice(0,28))}${(c.text||'').length>28?'…':''} · ${daysLabel(daysOpen(c))}`
+      : `${escapeHtml((c.text||'').slice(0,40))}${(c.text||'').length>40?'…':''}`;
+    return `<div class="case-card" style="${borderStyle}" onclick="openCase('${c.id}')">
       ${gaugeHTML(c.intensity || 1)}
       <div class="card-body">
         <div class="card-title">${escapeHtml(title)}</div>
-        <div class="card-sub">${escapeHtml((c.text||'').slice(0,40))}${(c.text||'').length>40?'…':''}</div>
+        <div class="card-sub">${subLine}</div>
       </div>
       ${badgeHtml}
     </div>`;
@@ -698,7 +725,7 @@ function renderDetail(c){
       <div class="section-label">מה קרה בפועל?</div>
       <p class="msg-quiet" style="margin-bottom:14px;">עשיתם את זה? מה יצא מזה?</p>
       <div class="outcome-grid" id="outcome-grid">
-        ${['הסתדר','חלקית','לא הלך','ויתרתי'].map(o => `<div class="outcome-opt" onclick="selectOutcome(this,'${o}')">${o}</div>`).join('')}
+        ${['הסתדר','חלקית','לא הלך','נסגר מעצמו','ויתרתי'].map(o => `<div class="outcome-opt" onclick="selectOutcome(this,'${o}')">${o}</div>`).join('')}
       </div>
       <div class="form-wrap" style="padding-top:0;">
         <textarea id="outcome-note" rows="3" placeholder="שורה אחת, אם בא לכם (לא חובה)"></textarea>
@@ -763,4 +790,3 @@ function resetApp(){
 </script>
 </body>
 </html>
-```
