@@ -211,6 +211,31 @@
   .msg-quiet{font-size:13px; color:var(--ink-soft); text-align:center; padding:0 30px; margin-top:10px; line-height:1.6;}
 
   .sticky-bottom{position:sticky; bottom:0; padding:16px 20px 6px; background:linear-gradient(to top, var(--paper) 60%, transparent);}
+
+  /* Rehearsal room */
+  .rehearse-intro{
+    font-family:'Frank Ruhl Libre',serif; font-size:19px; line-height:1.55; text-align:center;
+    padding:24px 26px 6px; color:var(--ink);
+  }
+  .rehearse-sub{font-size:13px; color:var(--ink-soft); text-align:center; padding:0 30px 18px;}
+  .chat-wrap{padding:6px 20px 16px; display:flex; flex-direction:column; gap:10px;}
+  .chat-bubble{
+    max-width:78%; padding:11px 15px; border-radius:16px; font-size:14px; line-height:1.6;
+    width:fit-content;
+  }
+  .chat-bubble.me{margin-left:auto; margin-right:0; background:var(--accent); color:#fff; border-bottom-left-radius:4px;}
+  .chat-bubble.other{margin-right:auto; margin-left:0; background:var(--card); border:1px solid var(--border); border-bottom-right-radius:4px;}
+  .chat-bubble.who{font-size:11px; font-weight:600; color:var(--ink-soft); margin-bottom:3px; display:block;}
+  .chat-input-row{display:flex; gap:8px; padding:12px 20px 4px; align-items:flex-end;}
+  .chat-input-row textarea{flex:1; resize:none; min-height:44px;}
+  .chat-send-btn{
+    flex-shrink:0; width:44px; height:44px; border-radius:50%; border:none;
+    background:var(--ink); color:var(--paper); font-size:18px; cursor:pointer;
+  }
+  .rehearse-closing{
+    margin:10px 20px 0; background:var(--accent-soft); border-radius:12px; padding:14px 16px;
+    font-size:13.5px; line-height:1.7; color:var(--ink); text-align:center;
+  }
 </style>
 </head>
 <body>
@@ -319,10 +344,22 @@
     </div>
     <div class="result-card" id="chosen-card"></div>
     <p class="msg-quiet" style="margin:0 20px 20px;">עכשיו זה עליכם. נסו את זה, ותוך יום-יומיים חזרו לתיק הזה כדי לספר מה קרה בפועל, זה החלק שהכי שווה.</p>
-    <div class="form-wrap" style="padding-top:0;">
+    <div class="form-wrap" style="padding-top:0;" id="chosen-actions">
       <button class="btn" onclick="goTo('home')">חזרה לרשימת התיקים</button>
       <button class="btn btn-outline" style="margin-top:10px;" onclick="goTo('new')">לפתוח מקרה נוסף</button>
     </div>
+  </div>
+
+  <!-- REHEARSAL ROOM -->
+  <div class="view" id="view-rehearse">
+    <div class="topbar">
+      <div class="icon-btn" onclick="goTo('chosen')">‹</div>
+      <h1 style="font-size:19px;">חדר החזרות</h1>
+      <div style="width:38px;"></div>
+    </div>
+    <div id="rehearse-intro-slot"></div>
+    <div class="chat-wrap" id="chat-messages"></div>
+    <div id="rehearse-input-slot"></div>
   </div>
 
   <!-- CASE DETAIL (in progress / done) -->
@@ -683,6 +720,94 @@ function renderChosen(c){
     <div class="option-title" style="margin-bottom:8px;">${escapeHtml(c.chosenOption.title)}</div>
     <p class="option-desc" style="text-align:right;">${escapeHtml(c.chosenOption.description)}</p>
   `;
+  const actionsEl = document.getElementById('chosen-actions');
+  const rehearseBtn = c.chosenOption.message
+    ? `<button class="btn btn-accent" style="margin-bottom:10px;" onclick="openRehearsal()">לתרגל רגע?</button>`
+    : '';
+  actionsEl.innerHTML = `
+    ${rehearseBtn}
+    <button class="btn" onclick="goTo('home')">חזרה לרשימת התיקים</button>
+    <button class="btn btn-outline" style="margin-top:10px;" onclick="goTo('new')">לפתוח מקרה נוסף</button>
+  `;
+}
+
+const REHEARSAL_MAX_EXCHANGES = 3;
+
+function openRehearsal(){
+  const c = getCase(activeCaseId);
+  if(!c) return;
+  if(!c.rehearsal){
+    c.rehearsal = { messages: [], exchanges: 0, closed: false };
+    saveCases();
+  }
+  renderRehearsal(c);
+  goTo('rehearse');
+}
+
+function renderRehearsal(c){
+  const introSlot = document.getElementById('rehearse-intro-slot');
+  const chatEl = document.getElementById('chat-messages');
+  const inputSlot = document.getElementById('rehearse-input-slot');
+
+  if(c.rehearsal.messages.length === 0){
+    introSlot.innerHTML = `
+      <p class="rehearse-intro">זה הרבה יותר פשוט ממה שאת/ה אולי חושבים.<br>בואו נתרגל לרגע.</p>
+      <p class="rehearse-sub">קלוד יגלם את ${escapeHtml(c.relation || 'הצד השני')}. כתבו מה הייתם אומרים.</p>
+    `;
+  } else {
+    introSlot.innerHTML = '';
+  }
+
+  chatEl.innerHTML = c.rehearsal.messages.map(m => `
+    <div class="chat-bubble ${m.role === 'me' ? 'me' : 'other'}">
+      ${m.role !== 'me' ? `<span class="who">${escapeHtml(c.relation || 'הצד השני')}</span>` : ''}
+      ${escapeHtml(m.text)}
+    </div>
+  `).join('');
+
+  if(c.rehearsal.closed){
+    inputSlot.innerHTML = `
+      <div class="rehearse-closing">ראיתם? זה נגמר הרבה יותר מהר ופשוט ממה שדמיינתם מראש.</div>
+      <div class="form-wrap"><button class="btn" onclick="goTo('chosen')">חזרה לתיק</button></div>
+    `;
+  } else {
+    inputSlot.innerHTML = `
+      <div class="chat-input-row">
+        <textarea id="rehearse-input" rows="1" placeholder="מה הייתם אומרים?"></textarea>
+        <button class="chat-send-btn" id="rehearse-send-btn" onclick="sendRehearsalMessage()" aria-label="שליחה">↑</button>
+      </div>
+    `;
+  }
+  chatEl.scrollTop = chatEl.scrollHeight;
+}
+
+async function sendRehearsalMessage(){
+  const c = getCase(activeCaseId);
+  if(!c) return;
+  const input = document.getElementById('rehearse-input');
+  const text = input.value.trim();
+  if(!text) return;
+
+  c.rehearsal.messages.push({ role: 'me', text });
+  saveCases();
+  renderRehearsal(c);
+
+  const sendBtn = document.getElementById('rehearse-send-btn');
+  if(sendBtn){ sendBtn.disabled = true; }
+  if(input){ input.disabled = true; }
+
+  const transcript = c.rehearsal.messages.map(m => `${m.role === 'me' ? 'המשתמש' : c.relation}: ${m.text}`).join('\n');
+  const systemPrompt = `אתה מגלם אך ורק דמות אחת: ${c.relation || 'הצד השני'}, בתרגול שיחה עם המשתמש. הקשר הסיטואציה: ${c.text}. המשתמש בחר לפעול כך: ${c.chosenOption.description}. הגב בעברית טבעית וקצרה (עד שני משפטים), בגוף ראשון, בדיוק כמו שהדמות הזו הייתה מגיבה במציאות, לא יותר דרמטי ולא יותר קשה משיחה אמיתית. אל תצא מהדמות בשום מקרה, אל תיתן עצות, אל תזכיר שאתה בינה מלאכותית, ואל תוסיף הערות מחוץ לדמות. עליך להחזיר אך ורק אובייקט JSON תקין: {"reply": "התגובה שלך בתפקיד הדמות"}`;
+
+  const result = await callClaude(systemPrompt, `השיחה עד כה:\n${transcript}\n\nהגב כ${c.relation}:`, 200, FAST_MODEL);
+  const reply = (result && result.reply) ? result.reply : 'זה בסדר, אני שומע אותך.';
+  c.rehearsal.messages.push({ role: 'other', text: reply });
+  c.rehearsal.exchanges = (c.rehearsal.exchanges || 0) + 1;
+  if(c.rehearsal.exchanges >= REHEARSAL_MAX_EXCHANGES){
+    c.rehearsal.closed = true;
+  }
+  saveCases();
+  renderRehearsal(c);
 }
 
 /* ---------- CASE DETAIL / STAGE 3 ---------- */
