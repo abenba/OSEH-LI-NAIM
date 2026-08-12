@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -546,7 +547,30 @@ function renderStage1(c){
     </div>
     <p class="reasoning">${escapeHtml(c.reasoning || '')}</p>
     ${c.spotlightLine ? `<div class="spotlight"><b>איך זה כנראה נראה מהצד השני:</b><br>${escapeHtml(c.spotlightLine)}</div>` : ''}
+    <div id="alt-slot" style="margin-top:14px;">
+      ${c.altInterpretation
+        ? `<div class="spotlight" style="border-right-color:var(--mid);"><b>ואולי בכלל...</b><br>${escapeHtml(c.altInterpretation)}</div>`
+        : `<button class="btn-ghost" style="width:auto; padding:6px 4px; font-size:13px;" onclick="fetchAltInterpretation()" id="alt-btn">ואולי בכלל...</button>`
+      }
+    </div>
   `;
+}
+
+async function fetchAltInterpretation(){
+  const c = getCase(activeCaseId);
+  if(!c) return;
+  const btn = document.getElementById('alt-btn');
+  if(btn){ btn.textContent = 'חושבים...'; btn.disabled = true; }
+
+  const systemPrompt = `אתה עוזר שמציע נקודת מבט חלופית על סיטואציה של "אי נעימות" בין־אישית. קיבלת תיאור מקרה, את הקשר עם הצד השני, ואת ההערכה הנוכחית שלו. עליך להחזיר אך ורק אובייקט JSON תקין, ללא טקסט נוסף וללא markdown, במבנה הבא:
+{"alt": "משפט אחד קצר בעברית שמציע פרשנות חלופית וסבירה לאותה סיטואציה, שונה מהותית מהנימוק וממה שכבר נאמר, לא סתם ניסוח מחדש. יכולה להיות מרגיעה או לא, העיקר שתהיה אמינה ולא מומצאת."}
+עד 18 מילה. אל תוסיף הסברים, רק את אובייקט ה-JSON.`;
+  const userText = `תיאור המקרה: ${c.text}\nקשר: ${c.relation}\nעוצמה: ${c.intensity}/10\nנימוק קיים: ${c.reasoning}\nזווית קיימת: ${c.spotlightLine || ''}`;
+
+  const result = await callClaude(systemPrompt, userText, 300, FAST_MODEL);
+  c.altInterpretation = (result && result.alt) ? result.alt : 'לא הצלחנו להציע זווית נוספת כרגע.';
+  saveCases();
+  renderStage1(c);
 }
 
 /* ---------- STAGE 2 ---------- */
@@ -739,3 +763,4 @@ function resetApp(){
 </script>
 </body>
 </html>
+```
