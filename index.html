@@ -237,6 +237,8 @@
   .chat-bubble.me{margin-left:auto; margin-right:0; background:var(--accent); color:#fff; border-bottom-left-radius:4px;}
   .chat-bubble.other{margin-right:auto; margin-left:0; background:var(--card); border:1px solid var(--border); border-bottom-right-radius:4px;}
   .chat-bubble.who{font-size:11px; font-weight:600; color:var(--ink-soft); margin-bottom:3px; display:block;}
+  #typing-indicator{color:var(--ink-soft); animation:pulseTyping 1.2s ease-in-out infinite;}
+  @keyframes pulseTyping{0%,100%{opacity:.5;} 50%{opacity:1;}}
   .chat-input-row{display:flex; gap:8px; padding:12px 20px 4px; align-items:flex-end;}
   .chat-input-row textarea{flex:1; resize:none; min-height:44px;}
   .chat-send-btn{
@@ -669,7 +671,7 @@ function renderStage1(c){
     <div id="alt-slot" style="margin-top:14px;">
       ${c.altInterpretation
         ? `<div class="spotlight" style="border-right-color:var(--mid);"><b>ואולי בכלל...</b><br>${escapeHtml(c.altInterpretation)}</div>`
-        : `<button class="btn-ghost" style="width:auto; padding:6px 4px; font-size:13px;" onclick="fetchAltInterpretation()" id="alt-btn">ואולי בכלל...</button>`
+        : `<button class="btn-ghost" style="width:auto; padding:6px 4px; font-size:14px; color:var(--accent); font-weight:700; text-decoration:underline;" onclick="fetchAltInterpretation()" id="alt-btn">ואולי בכלל...</button>`
       }
     </div>
   `;
@@ -854,11 +856,21 @@ async function sendRehearsalMessage(){
   if(sendBtn){ sendBtn.disabled = true; }
   if(input){ input.disabled = true; }
 
+  const chatEl = document.getElementById('chat-messages');
+  const typingBubble = document.createElement('div');
+  typingBubble.className = 'chat-bubble other';
+  typingBubble.id = 'typing-indicator';
+  typingBubble.innerHTML = `<span class="who">${escapeHtml(c.relation || 'הצד השני')}</span>מקליד/ה...`;
+  chatEl.appendChild(typingBubble);
+  chatEl.scrollTop = chatEl.scrollHeight;
+
   const transcript = c.rehearsal.messages.map(m => `${m.role === 'me' ? 'המשתמש' : c.relation}: ${m.text}`).join('\n');
   const systemPrompt = `אתה מגלם דמות אחת בלבד בתרגול שיחה: ${c.relation || 'הצד השני'}. חשוב מאוד להבין את החלוקה: המשתמש הוא זה שעשה או אמר את מה שמתואר כאן, מתוך נקודת המבט שלו: "${c.text}". אתה, ${c.relation || 'הצד השני'}, הוא מי שקיבל וחווה את ההתנהגות הזו, לא מי שביצע אותה. לעולם אל תחזור על הדברים שהמשתמש עשה כאילו אתה עשית אותם. עכשיו המשתמש בחר לפעול כך כלפיך: ${c.chosenOption.description}. הגב אך ורק מנקודת המבט של ${c.relation || 'הצד השני'}, בעברית תקנית וטבעית לחלוטין (לא שפה משובשת), קצר (עד שני משפטים), בגוף ראשון. אל תצא מהדמות בשום מקרה, אל תיתן עצות, אל תזכיר בינה מלאכותית. עליך להחזיר אך ורק אובייקט JSON תקין: {"reply": "התגובה שלך בתפקיד ${c.relation || 'הצד השני'} בלבד"}`;
 
   const result = await callClaude(systemPrompt, `השיחה עד כה:\n${transcript}\n\nהגב כ${c.relation || 'הצד השני'}, לא כמו המשתמש:`, 200);
   const reply = (result && result.reply) ? result.reply : 'זה בסדר, אני שומע אותך.';
+  const stillTyping = document.getElementById('typing-indicator');
+  if(stillTyping) stillTyping.remove();
   c.rehearsal.messages.push({ role: 'other', text: reply });
   c.rehearsal.exchanges = (c.rehearsal.exchanges || 0) + 1;
   if(c.rehearsal.exchanges >= REHEARSAL_MAX_EXCHANGES){
