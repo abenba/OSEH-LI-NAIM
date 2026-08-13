@@ -256,7 +256,8 @@
       ה"לא נעים" צובר ריבית. ככל שהזמן עובר, התחושה הזאת מתעצמת ומתקבעת.
     </p>
     <p class="lede-q">האם לא הגיע הזמן לפרק את זה? האם יכול להיות, בכלל, שהפרוש שלכם לכל הסיטואציה מוטעה? בואו ננסה לסגור את הסיפור.</p>
-    <button class="btn" onclick="startFirstCase()">פותחים תיק ראשון</button>
+    <button class="btn" id="onboarding-cta" onclick="startFirstCase()">פותחים תיק ראשון</button>
+    <button class="btn-ghost" id="onboarding-to-list" style="width:100%; margin-top:6px; font-size:13px; display:none;" onclick="goTo('home')">לרשימת התיקים שלי</button>
     <button class="btn-ghost" style="width:100%; margin-top:6px; font-size:13px;" onclick="showAbout()">אודות</button>
   </div>
 
@@ -419,6 +420,7 @@ function goTo(viewName, isBack){
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-' + viewName).classList.add('active');
   if(viewName === 'home') renderHome();
+  if(viewName === 'onboarding') renderOnboardingCTA();
   window.scrollTo(0,0);
 }
 
@@ -431,6 +433,19 @@ function goBack(){
 function startFirstCase(){
   localStorage.setItem(ONBOARD_KEY, "1");
   goTo('new');
+}
+
+function renderOnboardingCTA(){
+  const cta = document.getElementById('onboarding-cta');
+  const toList = document.getElementById('onboarding-to-list');
+  if(!cta) return;
+  if(cases.length > 0){
+    cta.textContent = 'פותחים תיק חדש';
+    if(toList) toList.style.display = 'block';
+  } else {
+    cta.textContent = 'פותחים תיק ראשון';
+    if(toList) toList.style.display = 'none';
+  }
 }
 
 /* ---------- word counter ---------- */
@@ -787,7 +802,9 @@ function renderRehearsal(c){
   if(c.rehearsal.closed){
     inputSlot.innerHTML = `
       <div class="rehearse-closing">ראיתם? זה נגמר הרבה יותר מהר ופשוט ממה שדמיינתם מראש.</div>
-      <div class="form-wrap"><button class="btn" onclick="goTo('chosen')">חזרה לתיק</button></div>
+      <div class="form-wrap"><button class="btn" onclick="goTo('chosen')">חזרה לתיק</button>
+        <button class="btn-ghost" style="width:100%; margin-top:6px; font-size:13px;" onclick="goTo('onboarding')">חזרה להתחלה</button>
+      </div>
     `;
   } else {
     inputSlot.innerHTML = `
