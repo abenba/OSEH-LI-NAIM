@@ -754,8 +754,8 @@ function renderChosen(c){
     <div class="option-title" style="margin-bottom:8px;">${escapeHtml(c.chosenOption.title)}</div>
     <p class="option-desc" style="text-align:right;">${escapeHtml(c.chosenOption.description)}</p>
   `;
-  const actionsEl = document.getElementById('chosen-actions');
-  const rehearseBtn = c.chosenOption.message
+  const isNoopChosen = c.chosenOption.title && c.chosenOption.title.includes('לא לעשות');
+  const rehearseBtn = !isNoopChosen
     ? `<button class="btn btn-accent" style="margin-bottom:10px;" onclick="openRehearsal()">לתרגל רגע?</button>`
     : '';
   actionsEl.innerHTML = `
